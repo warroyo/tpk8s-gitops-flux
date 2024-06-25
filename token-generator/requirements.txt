@@ -1,0 +1,3 @@
+requests
+apscheduler
+kubernetes==30.1.0
