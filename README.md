@@ -60,7 +60,7 @@ kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server'
 
 2. Update the `deploy/secret-templates/project-context.yml` to use your server url.
 
-3. create the secret store and templated secret.
+3. create the secret store, secret export, and templated secret.
 
 ```bash
 kubectl apply -f deploy/secret-templates
@@ -70,10 +70,17 @@ kubectl apply -f deploy/secret-templates
 
 Since the purpose of this is to deploy objects to UCP using gitops for this one we will be using flux for the deployment. 
 
-1. create the flux kustomization and git repo to point to the sample repo and directory.
+1. create the flux kustomization and git repo to point to the sample repo and directory. This also imports the secret
 
 
+```bash
+k apply -f deploy/flux-resources
+```
 
+
+## Validate
+
+at this point you should see a kustomization that is successfull and a new space created in your project.
 
 
 ## Building the token generator
