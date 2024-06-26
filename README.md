@@ -21,18 +21,57 @@ This example is not meant to show how to do gitops with flux. This is setup in a
 Pre-reqs:
 * TMC 
 * TMC managed flux
-* [secretgen controller](https://github.com/carvel-dev/secretgen-controller), this is installed by TMC automatically.  
+* [externla-secrets]()
 
 
 ### Deploy the controller. 
 
+This could easily be done by flux but for simplicity we are just deploying this via the command line.
+
+1. create the secret needed for the controller. this should be your CSP token.
+
+```bash
+cat <<'EOF' >deploy/token-generator-deploy/generator.env
+CSP_TOKEN=<your-token>
+EOF
+```
+
+2. deploy the controller into the cluster you plan to use for gitops with flux. Ideally this is a cluster managed by TMC with flux enabled. 
+
+```bash
+kubectl apply -k deploy/token-generator-deploy              
+```
+
+
+
 ### Create the kubeconfigs for UCP
 
-We will be using secretgen controller to handle the kubeconfig creation and also the distribution of the kubecofnigs to the correct namespaces
+We will be using external secrets operator to handle the kubeconfig creation and also secretgen controller to handle the distribution of the kubeconfigs to the correct namespaces. This could also easily be managed via flux but for simplicity we are just using the command line. Thsi example just sets up the project context but this could be done for space or cluster group the same way.
 
+1. get the server url from the current context on the cli. this is used for our in cluster kubecofnig secret
 
+```bash
+#get the context url from your local cli
+
+tanzu project use AMER-West
+export KUBECONFIG=~/.config/tanzu/kube/config
+kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server'
+```
+
+2. Update the `deploy/secret-templates/project-context.yml` to use your server url.
+
+3. create the secret store and templated secret.
+
+```bash
+kubectl apply -f deploy/secret-templates
+```
 
 ### Deploy a space to TPK8s
+
+Since the purpose of this is to deploy objects to UCP using gitops for this one we will be using flux for the deployment. 
+
+1. create the flux kustomization and git repo to point to the sample repo and directory.
+
 
 
 

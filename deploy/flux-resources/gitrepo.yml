@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tpk8s
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: tpk8s
+  namespace: tpk8s
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  timeout: 60s
+  url: https://github.com/warroyo/tpk8s-gitops-flux

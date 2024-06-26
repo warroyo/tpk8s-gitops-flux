@@ -68,8 +68,8 @@ class Controller():
     @refreshToken
     def run(self):
         logging.info("creating k8s secret")
-        # config.load_incluster_config()
-        config.load_kube_config()
+        config.load_incluster_config()
+        # config.load_kube_config()
         b = base64.b64encode(bytes(self.access_token, 'utf-8')) # bytes
         base64_str = b.decode('utf-8') # convert bytes to string
         k8s_client = client.ApiClient()
