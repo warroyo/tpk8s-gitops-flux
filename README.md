@@ -14,6 +14,12 @@ There is a security risk with enabling the exec functionality in flux. This also
 
 If you have a managed provider that installs your flux controllers like Tanzu platform then you won't want to deal with hacking the above to work. This solutions uses the OOTB flux controllers and some extra tools to handle connecting to the tanzu platform. It also does not require the `--insecure-kubeconfig-exec` flag. There are multiple ways this could be implemented , this was was chosen in order to reduce custom work and re-use as much existing tooling as possible. 
 
+### How it works
+
+The token-generator deployment will handle creating a access token from the CSP token as well as continously renewing it before expiration. This token is placed into a secret and the ESO templating capability is used to then create a valid kubeconfig for the project in UCP. Then a secret export is used to make this available to other namespaces. a standard flux kustomization is created that then uses the imported kubeconfig secret to target the UCP api.
+
+![](images/2024-07-01-09-56-56.png)
+
 ## Sample implementation
 
 This example is not meant to show how to do gitops with flux. This is setup in a very minimal so it can be easily understood.
