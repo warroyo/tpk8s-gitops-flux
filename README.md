@@ -27,7 +27,7 @@ This example is not meant to show how to do gitops with flux. This is setup in a
 Pre-reqs:
 * TMC 
 * TMC managed flux
-* [externla-secrets](https://external-secrets.io/main/)
+* [external-secrets](https://external-secrets.io/main/)
 
 
 ### Deploy the controller. 
