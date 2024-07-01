@@ -20,3 +20,28 @@ spec:
       resources: {}
   updateStrategy:
     type: Recreate
+
+---
+
+apiVersion: spaces.tanzu.vmware.com/v1alpha1
+kind: Space
+metadata:
+  name: gitops-created-space2
+  namespace: default
+spec:
+  availabilityTargets:
+  - name: k8s-upgrade
+    replicas: 1
+  revisionHistoryLimit: 10
+  template:
+    spec:
+      profiles:
+      - name: warroyo-networking
+        values:
+          inline: null
+      - name: spring-dev.tanzu.vmware.com
+        values:
+          inline: null
+      resources: {}
+  updateStrategy:
+    type: Recreate
