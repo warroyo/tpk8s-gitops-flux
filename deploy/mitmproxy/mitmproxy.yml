@@ -1,0 +1,76 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mitmproxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mitmproxy
+  namespace: mitmproxy
+  labels:
+    app: mitmproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mitmproxy
+  template:
+    metadata:
+      labels:
+        app: mitmproxy
+    spec:
+      containers:
+      - name: mitmweb
+        image: mitmproxy/mitmproxy
+        command: ["mitmdump"]
+        args: ["-p","8080","-s","version.py","--flow-detail","4"]
+        volumeMounts:
+        - mountPath: /version.py
+          name: version
+          subPath: version.py
+      volumes:
+      - name: version
+        configMap: 
+          name: version-script
+          items:
+            - key: version.py
+              path: version.py
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: version-script
+  namespace: mitmproxy
+data:
+  version.py: |
+    import logging
+
+    from mitmproxy import http
+    import json
+
+
+    def request(flow: http.HTTPFlow) -> None:
+        if flow.request.pretty_host == "api.tanzu.cloud.vmware.com" and "version?" in flow.request.pretty_url:
+            logging.info(f"url is {flow.request.pretty_url} responding")
+            json_response = '{"major":"1","minor":"28+","gitVersion":"v1.28.9-eks-036c24b","gitCommit":"f75443c988661ca0a6dfa0dc01ea82dd42d31278","gitTreeState":"clean","buildDate":"2024-04-30T23:54:04Z","goVersion":"go1.21.9","compiler":"gc","platform":"linux/amd64"}'
+            flow.response = http.Response.make(
+                200,  # (optional) status code
+              json_response,  # (optional) content
+                {"Content-Type": "application/json"},  # (optional) headers
+            )
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mitmproxy
+  namespace: mitmproxy
+spec:
+  selector:
+    app: mitmproxy
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: mitmproxy

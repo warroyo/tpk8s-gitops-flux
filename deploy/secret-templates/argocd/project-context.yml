@@ -1,0 +1,34 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name:  amer-west-project-cluster
+  namespace: argocd
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: k8s-store
+  target:
+    name: amer-west-project-cluster
+    template:
+      engineVersion: v2
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: cluster
+      data:
+        name: sa-tanzu-platform:AMER-West
+        clusterResources: "true"
+        server: https://api.tanzu.cloud.vmware.com/org/77aee83b-308f-4c8e-b9c4-3f7a6f19ba75/project/3b65ba5e-52a4-4666-ad29-4eefab93127b
+        config: |
+          {
+            "bearerToken": "{{ .token }}",
+            "tlsClientConfig": {
+              "insecure": true
+            }
+          }
+  data:
+  - secretKey: token
+    remoteRef:
+      key: ucp-access-token
+      property: access_token
+

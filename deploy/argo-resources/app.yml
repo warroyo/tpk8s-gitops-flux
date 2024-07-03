@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: amer-west-project
+  namespace: argocd
+spec:
+  destination:
+    name: 'sa-tanzu-platform:AMER-West'
+    namespace: default
+    server: ''
+  source:
+    path: deploy/tpk8s/AMER-West
+    repoURL: 'https://github.com/warroyo/tpk8s-gitops-flux'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    syncOptions:
+    - Validate=false
+    automated:
+      prune: false
+      selfHeal: false
